@@ -93,6 +93,7 @@ function drawText() {
 
 function autoShow(x, y) {
 	arrayJ[x][y] = true;
+	judgeOne(x, y);
 	//return;
 	if (y-1>=0) {
 		if (!array[x][y-1].visual) {
