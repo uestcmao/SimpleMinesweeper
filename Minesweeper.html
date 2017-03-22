@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<canvas id="canvas" width="600" height="600"></canvas>
+</body>
+<script type="text/javascript">
+const RANGE = 10;
+const BOOM = 25;
+let find = 0;
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var array = [];
+for (var i = 0; i < RANGE; i++) {
+	array[i] = [];
+	for (var j = 0; j < RANGE; j++) {
+		arrayJ[i][j] = {
+			number : 0,
+			visual : false,
+			flag : false
+		}
+	}
+}
+var index = 0;
+while(index<=BOOM){
+	var x = Math.floor(Math.random()*RANGE);
+	var y = Math.floor(Math.random()*RANGE);
+	if (array[x][y].number != -1) {
+		array[x][y].number = -1;
+		index++;
+		if (x+1 < RANGE) {
+			array[x+1][y].number == -1?array[x+1][y].number=-1:array[x+1][y].number++;
+			if (y+1<RANGE) {
+				array[x+1][y+1].number==-1?array[x+1][y+1].number=-1:array[x+1][y+1].number++;
+			}
+			if (y-1>=0) {
+				array[x+1][y-1].number==-1?array[x+1][y-1].number=-1:array[x+1][y-1].number++;
+			}
+		}
+		if (x-1>=0) {
+			array[x-1][y].number==-1?array[x-1][y].number=-1:array[x-1][y].number++;
+			if (y+1<RANGE) {
+				array[x-1][y+1].number==-1?array[x-1][y+1].number=-1:array[x-1][y+1].number++;
+			}
+			if (y-1>=0) {
+				array[x-1][y-1].number==-1?array[x-1][y-1].number=-1:array[x-1][y-1].number++;
+			}
+		}
+		if (y-1>=0) {
+			array[x][y-1].number==-1?array[x][y-1].number=-1:array[x][y-1].number++;
+		}
+		if (y+1<RANGE) {
+			array[x][y+1].number==-1?array[x][y+1].number=-1:array[x][y+1].number++;
+		}
+	}
+}
+console.table(array);
+document.oncontextmenu = function(){return false;}
+canvas.addEventListener("mousedown", function(event){
+  	if(event.region) {
+  		var x = event.region.split(":")[0];
+  		var y = event.region.split(":")[1];
+  		if (array[x][y].number==-1) {
+  			alert("you lose!");
+  		} else if(!array[x][y].visual) {
+  			autoShow(parseInt(x), parseInt(y));
+  			drawText();
+  		}
+
+  	}
+});
+
+for (var i = 0; i < RANGE; i++) {
+	for(var j = 0; j < RANGE; j++){
+		var rectangle = new Path2D();
+    	rectangle.rect(j*50, i*50, 50, 50);
+    	ctx.stroke(rectangle);
+    	ctx.addHitRegion({path:rectangle,id:i+":"+j});
+	}
+}
+
+function drawText() {
+	for (var i = 0; i < RANGE; i++) {
+		for(var j = 0; j < RANGE; j++){
+			if (array[i][j].visual) {
+				ctx.fillText(array[j][i].number, i*50+25, j*50+25);
+			}
+		}
+	}
+}
+
+function autoShow(x, y) {
+	arrayJ[x][y] = true;
+	//return;
+	if (y-1>=0) {
+		if (!array[x][y-1].visual) {
+			if (array[x][y-1].number == 0) {
+				array[x][y-1].visual = true;
+				autoShow(x, y-1);
+			} else {
+				if (array[x][y-1].number!=-1) {
+					array[x][y-1].visual = true;
+				}
+			}
+		}
+	}
+	if (x+1<RANGE) {
+		if(!array[x+1][y].visual){
+			if (array[x+1][y].number == 0) {
+				array[x+1][y].visual = true;
+				autoShow(x+1, y);
+			} else {
+				if (array[x+1][y].number!=-1) {
+					array[x+1][y].visual = true;
+				}
+			}
+		}
+	}
+	if (x-1>=0) {
+		if(!array[x-1][y].visual){
+			if (array[x-1][y].number == 0) {
+				array[x-1][y].visual = true;
+				autoShow(x-1, y);
+			} else {
+				if (array[x-1][y].number!=-1) {
+					array[x-1][y].visual = true;
+				}
+			}
+		}
+	}
+	if (y+1<RANGE) {
+		if(!array[x][y+1].visual){
+			if (array[x][y+1].number == 0) {
+				array[x][y+1].visual = true;
+				autoShow(x, y+1);
+			} else {
+				if (array[x][y+1].number!=-1) {
+					array[x][y+1].visual = true;
+				}
+			}
+		}
+	}
+}
+function autoMove(x, y) {
+
+}
+function judgeOne(x, y) {
+	var position = [];
+	var noVisual = 0;
+	var hasLei = 0;
+	if (x+1<RANGE) {
+		if (!array[x+1][y].visual) {
+			if (array[x+1][y].flag) {
+				hasLei++;
+			} else {
+				noVisual++;
+				position.push({
+					i:x+1,
+					j:y
+				});
+			}
+		}
+		if (y+1<RANGE) {
+			if (!array[x+1][y+1].visual) {
+				if (array[x+1][y+1].flag) {
+					hasLei++;
+				} else {
+					noVisual++;
+					position.push({
+						i:x+1,
+						j:y+1
+					});
+				}
+			}
+		}
+		if (y-1>=0) {
+			if (!array[x+1][y-1].visual) {
+				if (array[x+1][y-1].flag) {
+					hasLei++;
+				} else {
+					noVisual++;
+					position.push({
+						i:x+1,
+						j:y-1
+					});
+				}
+			}
+		}
+	}
+	if (x-1>=0) {
+		if (!array[x-1][y].visual) {
+			if (array[x-1][y].flag) {
+				hasLei++;
+			} else {
+				noVisual++;
+				position.push({
+					i:x-1,
+					j:y
+				});
+			}
+		}
+		if (y+1<RANGE) {
+			if (!array[x-1][y+1].visual) {
+				if (array[x-1][y+1].flag) {
+					hasLei++;
+				} else {
+					noVisual++;
+					position.push({
+						i:x-1,
+						j:y+1
+					});
+				}
+			}
+		}
+		if (y-1>=0) {
+			if (!array[x-1][y-1].visual) {
+				if (array[x-1][y+1].flag) {
+					hasLei++;
+				} else {
+					noVisual++;
+					position.push({
+						i:x-1,
+						j:y-1
+					});
+				}
+			}
+		}
+	}
+	if (y+1<RANGE) {
+		if (!array[x][y+1].visual) {
+			if (array[x][y+1].flag) {
+				hasLei++;
+			} else {
+				noVisual++;
+				position.push({
+					i:x,
+					j:y+1
+				});
+			}
+		}
+	}
+	if (y-1>=0) {
+		if (!array[x][y-1].visual) {
+			if (array[x][y-1].flag) {
+				hasLei++;
+			} else {
+				noVisual++;
+				position.push({
+					i:x,
+					j:y-1
+				});
+			}
+		}
+	}
+	if (hasLei == array[x][y].number) {
+		position.map(function(data){
+			MoniClick(data.i, data.j);
+		});
+	}
+	if (noVisual+hasLei == array[x][y].number) {
+		position.map(function(data){
+			array[data.i][data.j].flag=true;
+		});
+		MoniClick();
+	}
+}
+function judgeTwo(x, y) {
+
+}
+function MoniClick(x, y) {
+	while (true) {
+		var x = x || Math.floor(Math.random()*RANGE);
+		var y = y || Math.floor(Math.random()*RANGE);
+		if (array[x][y].number == -1) {
+			alert("you lose!");
+			return;
+		} else if(!array[x][y].visual) {
+			if (!array[x][y].flag) {
+				autoShow(x, y);
+				break;
+			}
+		}
+	}
+}
+</script>
+</html>
